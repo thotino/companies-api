@@ -18,6 +18,7 @@ module.exports = {
       loss: 858474,
       year: 2017,
       CompanyId: 1,
+      // siren: 135694027,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -27,6 +28,7 @@ module.exports = {
       loss: 8023406,
       year: 2016,
       CompanyId: 1,
+      // siren: 135694027,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -36,6 +38,7 @@ module.exports = {
       loss: 2812728,
       year: 2017,
       CompanyId: 2,
+      // siren: 107855014,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -45,6 +48,7 @@ module.exports = {
       loss: 657145,
       year: 2016,
       CompanyId: 2,
+      // siren: 107855014,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }])
