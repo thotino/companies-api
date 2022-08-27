@@ -17,7 +17,7 @@ module.exports = {
       ebitda: 65952,
       loss: 858474,
       year: 2017,
-      CompanyId: 135694027,
+      CompanyId: 1,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -26,7 +26,7 @@ module.exports = {
       ebitda: 290433,
       loss: 8023406,
       year: 2016,
-      CompanyId: 135694027,
+      CompanyId: 1,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -35,7 +35,7 @@ module.exports = {
       ebitda: 960673,
       loss: 2812728,
       year: 2017,
-      CompanyId: 107855014,
+      CompanyId: 2,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }, {
@@ -44,7 +44,7 @@ module.exports = {
       ebitda: 846608,
       loss: 657145,
       year: 2016,
-      CompanyId: 107855014,
+      CompanyId: 2,
       createdAt: new Date().toDateString(),
       updatedAt: new Date().toDateString()
     }])
