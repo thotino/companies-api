@@ -99,7 +99,7 @@ const populateDatabase = async (req, res) => {
     }))
     await transactionForCompanies.commit()
     await transactionForResults.commit()
-    return res.status(201)
+    return res.status(201).send({ updated: true })
   } catch (error) {
     await transactionForCompanies.rollback()
     await transactionForResults.rollback()
@@ -112,11 +112,15 @@ const compareCompanyResults = async (req, res) => {
     const { siren } = req.params
     const companyEntity = await db.Company.findOne({ where: { siren } })
     const company = companyEntity.toJSON()
+    
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
     const companyResultsEntities = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
-    const companyResults = companyResultsEntities.toJSON()
-    if (!companyResults || !companyResults.length) throw new Error('ERR_NO_RESULTS_FOUND')
-    const [firstYearResults, secondYearResults] = companyResults
+    if (!companyResultsEntities || !companyResultsEntities.length) throw new Error('ERR_NO_RESULTS_FOUND')
+
+    const [firstYearData, secondYearData] = companyResultsEntities
+    const firstYearResults = firstYearData.toJSON()
+    const secondYearResults = secondYearData.toJSON()
+    
     const comparison = {
       diffCA: (firstYearResults.ca - secondYearResults.ca) / secondYearResults.ca,
       diffMargin: (firstYearResults.margin - secondYearResults.margin) / secondYearResults.margin,
@@ -125,6 +129,7 @@ const compareCompanyResults = async (req, res) => {
     }
     return res.json(comparison)
   } catch (error) {
+    console.log(error.message)
     return res.send(error).status(500)
   }
 }

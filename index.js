@@ -25,7 +25,7 @@ app.delete('/api/companies/:siren', deleteAll)
 
 app.post('/api/companies/populate', populateDatabase)
 
-app.post('/api/companies/:siren/compare', compareCompanyResults)
+app.get('/api/companies/:siren/compare', compareCompanyResults)
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`)
