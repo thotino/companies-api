@@ -106,13 +106,15 @@ const populateDatabase = async (req, res) => {
     return res.send(error).status(500)
   }
 }
-
+const computeDiff = (firstOperand, secondOperand) => { 
+    return ((firstOperand - secondOperand) / secondOperand * 100).toFixed(2)
+}
 const compareCompanyResults = async (req, res) => {
   try {
     const { siren } = req.params
     const companyEntity = await db.Company.findOne({ where: { siren } })
     const company = companyEntity.toJSON()
-    
+
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
     const companyResultsEntities = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
     if (!companyResultsEntities || !companyResultsEntities.length) throw new Error('ERR_NO_RESULTS_FOUND')
@@ -122,10 +124,10 @@ const compareCompanyResults = async (req, res) => {
     const secondYearResults = secondYearData.toJSON()
     
     const comparison = {
-      diffCA: (firstYearResults.ca - secondYearResults.ca) / secondYearResults.ca,
-      diffMargin: (firstYearResults.margin - secondYearResults.margin) / secondYearResults.margin,
-      diffLoss: (firstYearResults.loss - secondYearResults.loss) / secondYearResults.loss,
-      diffEBITDA: (firstYearResults.ebitda - secondYearResults.ebitda) / secondYearResults.ebitda
+      diffCA: `${computeDiff(firstYearResults.ca, secondYearResults.ca)}%`,
+      diffMargin: `${computeDiff(firstYearResults.margin, secondYearResults.margin)}%`,
+      diffLoss: `${computeDiff(firstYearResults.loss, secondYearResults.loss)}%`,
+      diffEBITDA: `${computeDiff(firstYearResults.ebitda, secondYearResults.ebitda)}%`
     }
     return res.json(comparison)
   } catch (error) {
