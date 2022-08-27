@@ -38,7 +38,8 @@
     "sqlite3": "^5.0.8",
     "morgan": "^1.10.0",
     "jsonwebtoken": "^8.5.1",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "stream-json": "^1.7.4"
   },
   "devDependencies": {
     "sequelize-cli": "^6.4.1",
