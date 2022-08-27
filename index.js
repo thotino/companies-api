@@ -37,9 +37,36 @@ const createCompany = async (req, res) => {
 
 app.post('/api/companies', createCompany)
 
-// app.get('/api/tutorials/:id', [verifyToken, isModerator], find)
+const find = async (req, res) => {
+    try {
+      const { siren } = req.params
+      const company = await db.Company.findByPk(siren)
+      const allCompanyResults = await company.getCompanyResults()
+      return res.json({ ...company, results: allCompanyResults })
+    } catch (error) {
+      return res.send(error).status(500)
+    }
+  }
+app.get('/api/companies/:siren', find)
 
-// app.get('/api/companies', [verifyToken, isModerator], findAll)
+// const findAll = async (req, res) => {
+//     try {
+//       const { name = null, sector = null } = req.query
+//       let companies = null
+//       if (!name && !sector) {
+//         companies
+//       }
+//       else if (name && !sector) {}
+//       else if (!name && sector) {}
+//       else {}
+
+//       return res.json(allTutorials)
+//     } catch (error) {
+//       return res.send(error).status(500)
+//     }
+//   }
+
+// app.get('/api/companies', findAll)
 
 // app.get('/api/tutorials/published', [verifyToken], findAllPublished)
 
