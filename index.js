@@ -95,7 +95,7 @@ const deleteAll = async (req, res) => {
   try {
     const { siren } = req.params
     const whereCondition = siren ? { siren } : {}
-    const numberOfDeletedInstances = await db.Tutorial.destroy({ where: whereCondition, transaction })
+    const numberOfDeletedInstances = await db.Company.destroy({ where: whereCondition, transaction })
     await transaction.commit()
     return res.send(`${numberOfDeletedInstances} companies deleted`)
   } catch (error) {
@@ -103,8 +103,10 @@ const deleteAll = async (req, res) => {
     return res.send(error).status(500)
   }
 }
-
+app.delete('/api/companies', deleteAll)
 app.delete('/api/companies/:siren', deleteAll)
+
+
 const populateDatabase = async (req, res) => {
     const transaction = await db.sequelize.transaction()
     try {
