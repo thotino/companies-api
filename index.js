@@ -43,27 +43,27 @@ const find = async (req, res) => {
 app.get('/api/companies/:siren', find)
 
 const findAll = async (req, res) => {
-
     try {
         const Op = db.Sequelize.Op
-      const { name = null, sector = null } = req.query
-      let whereCondition = {}
+      const { name = null, sector = null, page = 0, limit = 10 } = req.query
+      let options = { 
+        limit, 
+        offset: page*limit 
+        }
       if (!name && !sector) {
       }
       else if (name && !sector) {
-        whereCondition = { where: { name: { [Op.like]: `%${name}%` } } }
+        options.where = { name: { [Op.like]: `%${name}%` } }
       }
       else if (!name && sector) {
-        whereCondition = { where: { sector } }
+        options.where = { sector }
       }
       else {
-        whereCondition = { 
-            where: {
+        options.where = {
                 [Op.and]: [{ name: { [Op.like]: `%${name}%`} }, { sector }]
             }
-         }
       }
-      const companies = await db.Company.findAll(whereCondition)
+      const companies = await db.Company.findAll(options)
       return res.json(companies)
     } catch (error) {
       return res.send(error).status(500)
