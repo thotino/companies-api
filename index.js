@@ -32,9 +32,9 @@ app.post('/api/companies', createCompany)
 const find = async (req, res) => {
     try {
       const { siren } = req.params
-      const company = await db.Company.findOne({ where: siren })
-      console.log({ company })
-      const allCompanyResults = await company.getCompanyResults()
+      const companyEntity = await db.Company.findOne({ where: { siren } })
+      const company = companyEntity.toJSON()
+      const allCompanyResults = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
       return res.json({ ...company, results: allCompanyResults })
     } catch (error) {
       return res.send(error).status(500)
@@ -77,12 +77,12 @@ const createCompanyResults = async (req, res) => {
   try {
     const { siren } = req.params
     const { year, ca, margin, ebitda, loss } = req.body
-    const company = await db.Company.findByPk(siren)
+    const company = await db.Company.findOne({ where: { siren } })
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
-    const createdCompanyResults = await db.CompanyResults.create({ year, ca, margin, ebitda, loss }, { transaction })
-    await company.setCompanyResults(createdCompanyResults)
-    return res.json(company)
+    const createdCompanyResults = await db.CompanyResults.create({ year, ca, margin, ebitda, loss, CompanyId: company.id }, { transaction })
+    return res.json({ ...createdCompanyResults, siren })
   } catch (error) {
+    console.log(error.message)
     await transaction.rollback()
     return res.send(error).status(500)
   }
@@ -108,27 +108,44 @@ app.delete('/api/companies/:siren', deleteAll)
 
 
 const populateDatabase = async (req, res) => {
-    const transaction = await db.sequelize.transaction()
+    const transactionForCompanies = await db.sequelize.transaction()
+    const transactionForResults = await db.sequelize.transaction()
     try {
         const companiesData = await fs.readJSON('./tkt_companies_data.json')
         await Promise.all(companiesData.map(async (data) => {
             const { name, sector, siren, results } = data
-            await db.Company.create({ name, sector, siren }, { transaction })
+            const companyEntity = await db.Company.create({ name, sector, siren }, { transaction: transactionForCompanies })
+            const { id } = companyEntity.toJSON()
             results.map(async (result) => {
                 const { ca, margin, ebitda, loss, year } = result
-                await db.CompanyResults.create({ ca, margin, ebitda, loss, year }, { transaction })
+                await db.CompanyResults.create({ ca, margin, ebitda, loss, year, CompanyId: id }, { transaction: transactionForResults })
             })
             return true
         }))
-        await transaction.commit()
+        await transactionForCompanies.commit()
+        await transactionForResults.commit()
         return res.status(201)
     } catch (error) {
-        console.log(error.message)
-        await transaction.rollback()
+        await transactionForCompanies.rollback()
+        await transactionForResults.rollback()
         return res.send(error).status(500)
     }
 }
 app.post('/api/companies/populate', populateDatabase)
+
+// const compareCompanyResults = async (req, res) => {
+//   try {
+//     const { siren } = req.params
+//     const company = await db.Company.findOne({ where: { siren } })
+//     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
+//     const companyResults = await company.getCompanyResults()
+//     if (!companyResults || !companyResults.length) throw new Error('ERR_NO_RESULTS_FOUND')
+//     return true
+//   } catch (error) {
+    
+//   }
+// }
+// app.post('/api/companies/:siren/compare', compareCompanyResults)
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`)
