@@ -5,10 +5,6 @@ const morgan = require('morgan')
 const db = require('./models')
 const fs = require('fs-extra')
 
-// const { create, find, findAll, findAllPublished, deleteAll, updateOne } = require('./controllers/tutorial.controller')
-// const { signin, signup } = require('./controllers/auth.controller')
-// const { verifyToken, isAdmin, isModeratorOrAdmin, isModerator, checkRolesExisted, checkDuplicateUser } = require('./middlewares')
-// const db = require('./models')
 const app = express()
 
 app.use(cors())
@@ -16,10 +12,6 @@ app.use(bodyParser.json())
 app.use(morgan('combined'))
 
 const PORT = process.env.APP_SERVER_PORT || 3000
-
-// app.post('/api/auth/signup', [checkDuplicateUser, checkRolesExisted], signup)
-
-// app.post('/api/auth/signin', signin)
 
 const createCompany = async (req, res) => {
   const transaction = await db.sequelize.transaction()
@@ -40,7 +32,8 @@ app.post('/api/companies', createCompany)
 const find = async (req, res) => {
     try {
       const { siren } = req.params
-      const company = await db.Company.findByPk(siren)
+      const company = await db.Company.findOne({ where: siren })
+      console.log({ company })
       const allCompanyResults = await company.getCompanyResults()
       return res.json({ ...company, results: allCompanyResults })
     } catch (error) {
@@ -49,30 +42,35 @@ const find = async (req, res) => {
   }
 app.get('/api/companies/:siren', find)
 
-// const findAll = async (req, res) => {
-//     try {
-//       const { name = null, sector = null } = req.query
-//       let companies = null
-//       if (!name && !sector) {
-//         companies
-//       }
-//       else if (name && !sector) {}
-//       else if (!name && sector) {}
-//       else {}
+const findAll = async (req, res) => {
 
-//       return res.json(allTutorials)
-//     } catch (error) {
-//       return res.send(error).status(500)
-//     }
-//   }
+    try {
+        const Op = db.Sequelize.Op
+      const { name = null, sector = null } = req.query
+      let whereCondition = {}
+      if (!name && !sector) {
+      }
+      else if (name && !sector) {
+        whereCondition = { where: { name: { [Op.like]: `%${name}%` } } }
+      }
+      else if (!name && sector) {
+        whereCondition = { where: { sector } }
+      }
+      else {
+        whereCondition = { 
+            where: {
+                [Op.and]: [{ name: { [Op.like]: `%${name}%`} }, { sector }]
+            }
+         }
+      }
+      const companies = await db.Company.findAll(whereCondition)
+      return res.json(companies)
+    } catch (error) {
+      return res.send(error).status(500)
+    }
+  }
 
-// app.get('/api/companies', findAll)
-
-// app.get('/api/tutorials/published', [verifyToken], findAllPublished)
-
-// app.put('/api/tutorials/:id', [verifyToken, isModeratorOrAdmin], updateOne)
-
-// app.delete('/api/tutorials', [verifyToken, isAdmin], deleteAll)
+app.get('/api/companies', findAll)
 
 const createCompanyResults = async (req, res) => {
   const transaction = await db.sequelize.transaction()
