@@ -94,3 +94,9 @@ curl -X DELETE \
 curl -X GET \
   http://localhost:3000/api/companies/105376773/compare
 ```
+
+#### Populate a local database
+```sh
+curl -X POST \
+  http://localhost:3000/api/companies/populate
+```
