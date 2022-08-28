@@ -36,6 +36,7 @@ const findAll = async (req, res) => {
       offset: page * limit
     }
     if (!name && !sector) {
+      options.where = {}
     } else if (name && !sector) {
       options.where = { name: { [Op.like]: `%${name}%` } }
     } else if (!name && sector) {
