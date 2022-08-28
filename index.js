@@ -31,7 +31,7 @@ app.post('/api/companies/:siren/results', createCompanyResults)
 app.delete('/api/companies', deleteAll)
 app.delete('/api/companies/:siren', deleteAll)
 
-// Populate local database endpoint 
+// Populate local database endpoint
 app.post('/api/companies/populate', populateDatabase)
 
 // Compare the accounting resultsof a single company endpoint
