@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate (models) {
       // define association here
+      // TO DO: Use siren as the PK
       this.hasMany(models.CompanyResults)
     }
   }

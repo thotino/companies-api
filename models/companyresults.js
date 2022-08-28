@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate (models) {
       // define association here
+      // TO DO: Maybe `siren` could be the foreign key for this association
       this.belongsTo(models.Company)
     }
   }
