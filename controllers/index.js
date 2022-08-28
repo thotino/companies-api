@@ -10,6 +10,7 @@ const createCompany = async (req, res) => {
     await transaction.commit()
     return res.json(createdCompany)
   } catch (error) {
+    console.log(error.message)
     await transaction.rollback()
     return res.send(error).status(500)
   }
@@ -18,11 +19,11 @@ const createCompany = async (req, res) => {
 const find = async (req, res) => {
   try {
     const { siren } = req.params
-    const companyEntity = await db.Company.findOne({ where: { siren } })
+    const companyEntity = await db.Company.findOne({ where: { siren }, include: db.CompanyResults })
     const company = companyEntity.toJSON()
-    const allCompanyResults = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
-    return res.json({ ...company, results: allCompanyResults })
+    return res.json(company)
   } catch (error) {
+    console.log(error.message)
     return res.send(error).status(500)
   }
 }
@@ -49,6 +50,7 @@ const findAll = async (req, res) => {
     const companies = await db.Company.findAll(options)
     return res.json(companies)
   } catch (error) {
+    console.log(error.message)
     return res.send(error).status(500)
   }
 }
@@ -60,6 +62,7 @@ const createCompanyResults = async (req, res) => {
     const { year, ca, margin, ebitda, loss } = req.body
     const company = await db.Company.findOne({ where: { siren } })
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
+    // TO DO: Create this instance using the association (instead of manually)
     const createdCompanyData = await db.CompanyResults.create({ year, ca, margin, ebitda, loss, CompanyId: company.id }, { transaction })
     const createdResults = createdCompanyData.toJSON()
     return res.json({ ...createdResults, siren })
@@ -79,6 +82,7 @@ const deleteAll = async (req, res) => {
     await transaction.commit()
     return res.send(`${numberOfDeletedInstances} companies deleted`)
   } catch (error) {
+    console.log(error.message)
     await transaction.rollback()
     return res.send(error).status(500)
   }
@@ -103,6 +107,7 @@ const populateDatabase = async (req, res) => {
     await transactionForResults.commit()
     return res.status(201).send({ updated: true })
   } catch (error) {
+    console.log(error.message)
     await transactionForCompanies.rollback()
     await transactionForResults.rollback()
     return res.send(error).status(500)
@@ -114,19 +119,16 @@ const computeDiff = (firstOperand, secondOperand) => {
 const compareCompanyResults = async (req, res) => {
   try {
     const { siren } = req.params
-    const companyEntity = await db.Company.findOne({ where: { siren } })
+    const companyEntity = await db.Company.findOne({ where: { siren }, include: db.CompanyResults })
     const company = companyEntity.toJSON()
 
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
-    const companyResultsEntities = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
+    const companyResultsEntities = company.CompanyResults
     if (!companyResultsEntities || !companyResultsEntities.length) throw new Error('ERR_NO_RESULTS_FOUND')
 
-    const firstYearData = companyResultsEntities.find(({ year }) => (year === 2017))
-    const secondYearData = companyResultsEntities.find(({ year }) => (year === 2016))
-    if (!firstYearData || !secondYearData) throw new Error('ERR_ACCOUNTING_RESULTS_FOR_REQUESTED_YEARS_NOT_FOUND')
-
-    const firstYearResults = firstYearData.toJSON()
-    const secondYearResults = secondYearData.toJSON()
+    const firstYearResults = companyResultsEntities.find(({ year }) => (year === 2017))
+    const secondYearResults = companyResultsEntities.find(({ year }) => (year === 2016))
+    if (!firstYearResults || !secondYearResults) throw new Error('ERR_ACCOUNTING_RESULTS_FOR_REQUESTED_YEARS_NOT_FOUND')
 
     const comparison = {
       diffCA: `${computeDiff(firstYearResults.ca, secondYearResults.ca)}%`,
