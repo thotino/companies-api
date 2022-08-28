@@ -59,8 +59,9 @@ const createCompanyResults = async (req, res) => {
     const { year, ca, margin, ebitda, loss } = req.body
     const company = await db.Company.findOne({ where: { siren } })
     if (!company) throw new Error('ERR_COMPANY_NOT_FOUND')
-    const createdCompanyResults = await db.CompanyResults.create({ year, ca, margin, ebitda, loss, CompanyId: company.id }, { transaction })
-    return res.json({ ...createdCompanyResults, siren })
+    const createdCompanyData = await db.CompanyResults.create({ year, ca, margin, ebitda, loss, CompanyId: company.id }, { transaction })
+    const createdResults = createdCompanyData.toJSON()
+    return res.json({ ...createdResults, siren })
   } catch (error) {
     console.log(error.message)
     await transaction.rollback()
@@ -106,8 +107,8 @@ const populateDatabase = async (req, res) => {
     return res.send(error).status(500)
   }
 }
-const computeDiff = (firstOperand, secondOperand) => { 
-    return ((firstOperand - secondOperand) / secondOperand * 100).toFixed(2)
+const computeDiff = (firstOperand, secondOperand) => {
+  return ((firstOperand - secondOperand) / secondOperand * 100).toFixed(2)
 }
 const compareCompanyResults = async (req, res) => {
   try {
@@ -119,10 +120,13 @@ const compareCompanyResults = async (req, res) => {
     const companyResultsEntities = await db.CompanyResults.findAll({ where: { CompanyId: company.id } })
     if (!companyResultsEntities || !companyResultsEntities.length) throw new Error('ERR_NO_RESULTS_FOUND')
 
-    const [firstYearData, secondYearData] = companyResultsEntities
+    const firstYearData = companyResultsEntities.find(({ year }) => (year === 2017))
+    const secondYearData = companyResultsEntities.find(({ year }) => (year === 2016))
+    if (!firstYearData || !secondYearData) throw new Error('ERR_ACCOUNTING_RESULTS_FOR_REQUESTED_YEARS_NOT_FOUND')
+
     const firstYearResults = firstYearData.toJSON()
     const secondYearResults = secondYearData.toJSON()
-    
+
     const comparison = {
       diffCA: `${computeDiff(firstYearResults.ca, secondYearResults.ca)}%`,
       diffMargin: `${computeDiff(firstYearResults.margin, secondYearResults.margin)}%`,

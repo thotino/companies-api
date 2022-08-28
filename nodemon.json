@@ -1,6 +1,8 @@
 {
     "watch": [
-        "index.js"
+        "index.js",
+        "./controllers/*.js",
+        "swagger.json"
     ],
     "exec": "node ."
 }
