@@ -57,6 +57,21 @@
                 }
             }
         },
+        "/api/companies/populate": {
+            "post": {
+                "summary": "Populate the local sqlite database with local data",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "updated": { "type": "boolean" }
+                        }
+                    }
+                }
+            }
+        },
         "/api/companies/{siren}": {
             "parameters": [{
                 "name": "siren",
