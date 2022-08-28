@@ -1,0 +1,212 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Companies API",
+      "description": "Companies RESTful API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+        "/api/companies": {
+            "post": {
+                "description": "Create a new company in the system",
+                "parameters": [{ 
+                    "name": "Company data",
+                    "in": "body",
+                    "description": "The company data",
+                    "schema": {
+                        "$ref": "#/definitions/Company"
+                    }
+                 }],
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Company"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "description": "Retrieve all the companies, based on some criteria",
+                "parameters": [{
+                    "name": "Query",
+                    "in": "query",
+                    "schema": {
+                        "$ref": "#/definitions/CompanyQuery"
+                    }
+                }],
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/Company"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/companies/{siren}": {
+            "parameters": [{
+                "name": "siren",
+                "in": "path",
+                "required": true,
+                "type": "integer",
+                "description": "The siren of the company we want to find or delete"
+            }],
+            "get": {
+                "summary": "Retrieve the available data for the given company",
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/SingleCompanyResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete the given company from the system",
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/companies/{siren}/results": {
+            "parameters": [{
+                "name": "siren",
+                "in": "path",
+                "required": true,
+                "type": "integer",
+                "description": "The siren of the company we want to find or delete"
+            }],
+            "post": {
+                "description": "Create a new results for the company in the system",
+                "parameters": [{ 
+                    "name": "Company results data",
+                    "in": "body",
+                    "description": "The company results data",
+                    "schema": {
+                        "$ref": "#/definitions/CompanyResultsParameters"
+                    }
+                 }],
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/CompanyResultsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/companies/{siren}/compare": {
+            "parameters": [{
+                "name": "siren",
+                "in": "path",
+                "required": true,
+                "type": "integer",
+                "description": "The siren of the company we want to find or delete"
+            }],
+            "get": {
+                "summary": "Return a comparison in % of the evolution of the given company accounting results",
+                "responses":{
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/CompanyResultsComparisonResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Company": {
+            "required": ["name", "sector", "siren"],
+            "properties": {
+                "name": { "type": "string" },
+                "sector": { "type": "string" },
+                "siren": { "type": "integer" }
+            }
+        },
+        "CompanyQuery": {
+            "properties": {
+                "name": { "type": "string" },
+                "sector": { "type": "string" },
+                "page": { "type": "integer" },
+                "limit": { "type": "integer" }
+            }
+        },
+        "SingleCompanyResponse": {
+            "properties": {
+                "id": { "type": "integer" },
+                "name": { "type": "string" },
+                "sector": { "type": "string" },
+                "siren": { "type": "integer" },
+                "createdAt": "2022-08-27T16:50:31.594Z",
+                "updatedAt": "2022-08-27T16:50:31.594Z",
+                "results": { 
+                    "type": "array", 
+                    "items": { 
+                        "type": "object", 
+                        "properties": {
+                            "id": { "type": "integer" },
+                            "year": { "type": "integer" },
+                            "ca": { "type": "integer" },
+                            "margin": { "type": "integer" },
+                            "ebitda": { "type": "integer" },
+                            "loss": { "type": "integer" },
+                            "CompanyId": { "type": "integer" }
+                        } 
+                    } 
+                    }
+              }
+        },
+        "CompanyResultsParameters": {
+            "required": ["year"],
+            "properties": {
+                "year": { "type": "integer" },
+                "ca": { "type": "integer" },
+                "margin": { "type": "integer" },
+                "ebitda": { "type": "integer" },
+                "loss": { "type": "integer" }
+            }
+        },
+        "CompanyResultsResponse": {
+            "properties": {
+                "year": { "type": "integer" },
+                "ca": { "type": "integer" },
+                "margin": { "type": "integer" },
+                "ebitda": { "type": "integer" },
+                "loss": { "type": "integer" },
+                "siren": { "type": "integer" }
+            }
+        },
+        "CompanyResultsComparisonResponse": {
+            "properties": {
+                "diffCA": { "type": "string" },
+                "diffMargin": { "type": "string" },
+                "diffLoss": { "type": "string" },
+                "diffEBITDA": { "type": "string" }
+            }
+        }
+    }
+  }
