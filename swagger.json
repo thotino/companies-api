@@ -17,7 +17,7 @@
     "paths": {
         "/api/companies": {
             "post": {
-                "description": "Create a new company in the system",
+                "summary": "Create a new company in the system",
                 "parameters": [{ 
                     "name": "Company data",
                     "in": "body",
@@ -38,9 +38,8 @@
                 }
             },
             "get": {
-                "description": "Retrieve all the companies, based on some criteria",
+                "summary": "Retrieve all the companies, based on some criteria",
                 "parameters": [{
-                    "name": "Query",
                     "in": "query",
                     "schema": {
                         "$ref": "#/definitions/CompanyQuery"
@@ -96,7 +95,7 @@
                 "description": "The siren of the company we want to find or delete"
             }],
             "post": {
-                "description": "Create a new results for the company in the system",
+                "summary": "Create a new results for the company in the system",
                 "parameters": [{ 
                     "name": "Company results data",
                     "in": "body",
@@ -149,10 +148,10 @@
         },
         "CompanyQuery": {
             "properties": {
-                "name": { "type": "string" },
-                "sector": { "type": "string" },
-                "page": { "type": "integer" },
-                "limit": { "type": "integer" }
+                "name": { "type": "string", "description": "The name of the company to find" },
+                "sector": { "type": "string", "description": "The sector name of the company to find" },
+                "page": { "type": "integer", "description": "The page to display" },
+                "limit": { "type": "integer", "description": "The number of instances to return" }
             }
         },
         "SingleCompanyResponse": {
