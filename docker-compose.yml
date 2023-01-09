@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+    companies_api:
+        build: "."
+        container_name: companies-api
+        image: companies-api
+        networks:
+            - app_network
+        environment:
+            - "NODE_ENV=development"
+            - "APP_SERVER_PORT=3000"
+        ports:
+            - 3000:3000
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000/hc"]            
+            interval: 1s
+            timeout: 3s
+            retries: 10    
+networks:
+    app_network:
+        driver: bridge
+        # name: app_network
+    public:
+        external: true
+volumes:
+    couchbase_data:
