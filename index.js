@@ -17,6 +17,9 @@ app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 const PORT = process.env.APP_SERVER_PORT || 3000
 
+// Healthcheck
+app.get('/hc', (req, res) => { res.json({ status: 'OK' }) })
+
 // Create company endpoint
 app.post('/api/companies', createCompany)
 
