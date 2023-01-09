@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: companies-deployment
+  labels:
+    app: companies
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: companies
+  template:
+    metadata:
+      labels:
+        app: companies
+    spec:
+      containers:
+      - name: companies-api
+        image: companies-api
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
