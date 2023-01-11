@@ -20,3 +20,16 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 3000
+        resources:
+          requests:
+            cpu: 200m
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /hc
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 1
